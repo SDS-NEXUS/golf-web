@@ -1,5 +1,5 @@
 // 골프 API 클라이언트 — 백엔드(golf-api)와 통신
-const BASE = (import.meta.env.VITE_API_BASE || 'https://golf-api.sdskorea.kr/api').replace(/\/$/, '')
+const BASE = (import.meta.env.VITE_API_BASE || 'https://nexus.sdskorea.kr/api').replace(/\/$/, '')
 
 const TOKEN_KEY = 'golf_admin_token'
 
