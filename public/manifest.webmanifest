@@ -1,0 +1,16 @@
+{
+    "name": "골때리는골프",
+    "short_name": "골때리는골프",
+    "description": "골때리는골프 시즌 리그 — 랭킹·라운드·통산 기록",
+    "lang": "ko",
+    "start_url": "/golf-web/",
+    "scope": "/golf-web/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#0f5132",
+    "theme_color": "#0f5132",
+    "icons": [
+        { "src": "/golf-web/golf-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+        { "src": "/golf-web/golf-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+    ]
+}
