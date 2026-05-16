@@ -6,49 +6,37 @@ import { apiGet } from '../api'
 const loading = ref(true)
 const error = ref('')
 const rounds = ref([])
-
-function fmtDate(d) {
-  return d ? String(d).slice(0, 10) : ''
-}
+const DOW = ['일', '월', '화', '수', '목', '금', '토']
+const dko = (d) => (d ? DOW[new Date(String(d).slice(0, 10)).getDay()] : '')
 
 onMounted(async () => {
-  try {
-    const data = await apiGet('/rounds')
-    rounds.value = data.rounds || []
-  } catch (e) { error.value = e.message }
+  try { rounds.value = (await apiGet('/rounds')).rounds || [] }
+  catch (e) { error.value = e.message }
   finally { loading.value = false }
 })
 </script>
 
 <template>
   <div v-if="loading" class="loading">불러오는 중…</div>
-  <div v-else-if="error" class="error">라운드를 불러오지 못했습니다 ({{ error }})</div>
-  <div v-else class="card">
-    <h2>라운드</h2>
-    <table v-if="rounds.length">
-      <thead><tr><th>날짜</th><th>구장</th><th>코스</th><th>상태</th></tr></thead>
-      <tbody>
-        <tr v-for="r in rounds" :key="r.id">
-          <td>
-            <RouterLink :to="'/rounds/' + r.id" style="font-weight:700;color:#198754">
-              {{ fmtDate(r.play_date) }}
-            </RouterLink>
-          </td>
-          <td>{{ r.club?.name || '−' }}</td>
-          <td class="muted">{{ r.front_course?.course_name }} + {{ r.back_course?.course_name }}</td>
-          <td>
-            <span :class="r.finalized ? 'st-fin' : 'st-open'">
-              {{ r.finalized ? '확정' : '진행중' }}
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <p v-else class="muted">등록된 라운드가 없습니다.</p>
+  <div v-else-if="error" class="error">라운드를 불러오지 못했습니다</div>
+  <div v-else>
+    <div class="section-title">전체 라운드</div>
+    <template v-if="rounds.length">
+      <RouterLink v-for="r in rounds" :key="r.id" :to="'/rounds/' + r.id" class="rank-row text-dark">
+        <i class="fa-solid fa-flag text-success" style="font-size:20px;"></i>
+        <div style="flex:1; min-width:0;">
+          <div class="member-name">{{ String(r.play_date).slice(0, 10) }} ({{ dko(r.play_date) }})</div>
+          <div class="member-meta">
+            {{ r.club?.name }}<br>
+            {{ r.front_course?.course_name }} / {{ r.back_course?.course_name }}
+          </div>
+        </div>
+        <div class="text-end">
+          <span v-if="r.finalized" class="badge bg-success">확정</span>
+          <span v-else class="badge bg-secondary">진행중</span>
+        </div>
+      </RouterLink>
+    </template>
+    <div v-else class="info-card text-center text-muted">등록된 라운드가 없습니다.</div>
   </div>
 </template>
-
-<style scoped>
-.st-fin { color: #198754; font-weight: 700; }
-.st-open { color: #94a3b8; }
-</style>
