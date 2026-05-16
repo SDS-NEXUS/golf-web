@@ -1,38 +1,40 @@
 <script setup>
+import { ref, onMounted } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
+import { apiGet } from './api'
+
+const season = ref(null)
+const played = ref(0)
+
+onMounted(async () => {
+  try {
+    const d = await apiGet('/season')
+    season.value = d.season
+    played.value = (d.recent_rounds || []).filter((r) => r.finalized).length
+  } catch (e) { /* 헤더 정보 없이도 진행 */ }
+})
 </script>
 
 <template>
-  <header class="app-header">
-    <div class="wrap hdr">
-      <h1>골때리는골프</h1>
-      <nav>
-        <RouterLink to="/">랭킹</RouterLink>
-        <RouterLink to="/rounds">라운드</RouterLink>
-        <RouterLink to="/records">통산 기록</RouterLink>
-        <RouterLink to="/rules">포인트 규정</RouterLink>
-        <RouterLink to="/admin" class="gear">설정</RouterLink>
-      </nav>
+  <div class="gtg-m-header">
+    <RouterLink to="/admin" class="gtg-m-gear"><i class="fa-solid fa-gear"></i></RouterLink>
+    <h1 class="gtg-m-title"><i class="fa-solid fa-golf-ball-tee me-1"></i>골때리는골프</h1>
+    <div class="gtg-m-sub">
+      <template v-if="season">
+        {{ season.name }} · {{ played }}/{{ season.planned_rounds }} 라운드 진행
+      </template>
+      <template v-else>시즌</template>
     </div>
-  </header>
-  <main class="wrap main">
-    <RouterView />
-  </main>
-</template>
+  </div>
 
-<style scoped>
-.app-header {
-  background: linear-gradient(135deg, #0f5132 0%, #198754 60%, #20c997 100%);
-  color: #fff;
-}
-.hdr { padding: 16px; }
-.app-header h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-nav { display: flex; gap: 4px; margin-top: 10px; flex-wrap: wrap; }
-nav a {
-  padding: 8px 12px; font-size: 14px; font-weight: 600;
-  color: #d1fae5; border-radius: 6px;
-}
-nav a.router-link-exact-active { background: rgba(255, 255, 255, 0.18); color: #fff; }
-nav a.gear { margin-left: auto; color: #a7f3d0; }
-.main { padding: 16px; }
-</style>
+  <div class="gtg-m-tabs">
+    <RouterLink to="/"><i class="fa-solid fa-trophy"></i> 랭킹</RouterLink>
+    <RouterLink to="/rounds"><i class="fa-solid fa-flag"></i> 라운드</RouterLink>
+    <RouterLink to="/records"><i class="fa-solid fa-chart-line"></i> 통산 기록</RouterLink>
+    <RouterLink to="/rules"><i class="fa-solid fa-book"></i> 규정</RouterLink>
+  </div>
+
+  <div class="gtg-m-content">
+    <RouterView />
+  </div>
+</template>
